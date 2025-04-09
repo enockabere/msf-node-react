@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import bcRoutes from "./routes/bcRoutes.js";
 import bcSoapRoutes from "./routes/bcSoapRoutes.js";
 
-import { sequelize } from "./models/index.js";
+import sequelize  from "./models/index.js";
 import User from "./models/userModel.js";
 
 dotenv.config();

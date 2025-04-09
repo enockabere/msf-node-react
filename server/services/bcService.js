@@ -1,3 +1,4 @@
+// services/odataService.js
 import axios from "axios";
 
 function buildODataUrl(endpoint, filters = [], queryParams = {}) {
@@ -27,22 +28,28 @@ export async function getFromOData(endpoint, filters = [], queryParams = {}) {
     const url = buildODataUrl(endpoint, filters, queryParams);
     console.log("🚀 Final OData URL:", url);
 
-    const response = await axios.get(url, {
-      auth: {
-        username: process.env.BC_USERNAME,
-        password: process.env.BC_PASSWORD,
-      },
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    const { AUTH_TYPE, BC_USERNAME, BC_PASSWORD } = process.env;
 
+    const headers = { Accept: "application/json" };
+    let axiosConfig = { headers };
+
+    if (AUTH_TYPE === "basic") {
+      axiosConfig.auth = {
+        username: BC_USERNAME,
+        password: BC_PASSWORD,
+      };
+    } else if (AUTH_TYPE === "ntlm") {
+      console.warn("⚠️ NTLM auth is not implemented yet.");
+      throw new Error("NTLM authentication is not supported yet.");
+    }
+
+    const response = await axios.get(url, axiosConfig);
     return response.data;
   } catch (error) {
     console.error(
       "❌ OData request failed:",
       error.response?.data || error.message
     );
-    throw error; // rethrow so Express can catch and return 500
+    throw error;
   }
 }
